@@ -1,4 +1,4 @@
-# Serverless - AWS Node.js Typescript
+# Serverless - Retry Mechanism with (aws-sqs-lamda-dynamoDB)
 ### Using NPM
 
 - Run `npm i` to install the project dependencies
