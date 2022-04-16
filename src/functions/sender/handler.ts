@@ -13,11 +13,11 @@ const sender: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event:A
   
   // SQS message parameters
   let params : SQS.Types.SendMessageRequest = {
-    MessageBody: event.body,
+    MessageBody: JSON.stringify(event.body),
     QueueUrl: queueUrl
   };
 
-  let result = await sqs.sendMessage(params);
+  let result = await sqs.sendMessage(params).promise();;
   console.log('data:', result);
   let responseBody = {
     message: ''

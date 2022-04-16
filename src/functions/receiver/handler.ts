@@ -2,6 +2,7 @@ import { middyfy } from '@libs/lambda';
 import { Context} from 'aws-lambda';
 import { SQS, DynamoDB } from 'aws-sdk';
 import { SQSEvent, SQSRecord, SQSRecordAttributes } from 'aws-lambda/trigger/sqs';
+import { PartialFailureError } from './../../errors/partial-failure.error';
 
 const sqs = new SQS();
 const dynamoDB = new DynamoDB.DocumentClient();
@@ -41,10 +42,17 @@ const receiver = async (sqsEvent: SQSEvent, context:Context) => {
     }
   });
 
-  await changeVisibilityMessages(retriableMessages);
-  await pushToDynamoDb(nonRetriableMessages);
-  await deleteMessages([...successfullyProcessedMessages,...nonRetriableMessages]);
+  if (successfullyProcessedMessages.length > 0 || nonRetriableMessages.length > 0) { await deleteMessages([...successfullyProcessedMessages, ...nonRetriableMessages]); }
 
+  if (nonRetriableMessages.length > 0) { await pushToDynamoDb(nonRetriableMessages); }
+
+  if (retriableMessages.length > 0) {
+    await changeVisibilityMessages(retriableMessages);
+    console.log('done changing visibility');
+    const errorMessage = `Failing due to ${retriableMessages} unsuccessful and retriable errors.`;
+    console.log(errorMessage);
+    throw new PartialFailureError(errorMessage);
+  }
 };
 
 let deleteMessages = async (deleteMessageRequests: DequeuedMessage[]): Promise<SQS.DeleteMessageBatchResult> => {

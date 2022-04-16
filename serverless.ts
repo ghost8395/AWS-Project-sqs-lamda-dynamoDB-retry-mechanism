@@ -23,7 +23,7 @@ const serverlessConfiguration: AWS = {
     iamRoleStatements: [
       {
         Effect: "Allow",
-        Action: ["sqs:SendMessage", "sqs:GetQueueUrl"],
+        Action: ["sqs:SendMessage", "sqs:GetQueueUrl", "sqs:ChangeMessageVisibility", "sqs:ChangeMessageVisibility", "sqs:ChangeMessageVisibilityBatch", "sqs:DeleteMessage", "sqs:DeleteMessageBatch"],
         Resource: "arn:aws:sqs:${self:provider.region}:*:MyQueue",
       },
       {
@@ -39,6 +39,7 @@ const serverlessConfiguration: AWS = {
           "dynamodb:GetItem",
           "dynamodb:PutItem",
           "dynamodb:UpdateItem",
+          "dynamodb:BatchWriteItem",
           "dynamodb:DeleteItem",
         ],
         Resource: "arn:aws:dynamodb:${self:provider.region}:*:*",
