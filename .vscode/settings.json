@@ -1,0 +1,17 @@
+{
+    "serverlessConsole.services": [
+        {
+            "type": "cloudformation",
+            "title": "serverlessAct",
+            "timeOffsetInMs": 0,
+            "awsProfile": "serverlessUser",
+            "stacks": [
+                {
+                    "region": "ap-south-1",
+                    "stackName": "serverless-proto-1-dev",
+                    "stage": "dev"
+                }
+            ]
+        }
+    ]
+}
