@@ -39,7 +39,6 @@ const receiver = async (sqsEvent: SQSEvent, context:Context) => {
 
   if (retriableMessages.length > 0) {
     await changeVisibilityMessages(retriableMessages, MESSAGE_QUEUE_URL);
-    console.log('done changing visibility');
     const errorMessage = `Failing due to ${retriableMessages} unsuccessful and retriable errors.`;
     console.log(errorMessage);
     throw new PartialFailureError(errorMessage);

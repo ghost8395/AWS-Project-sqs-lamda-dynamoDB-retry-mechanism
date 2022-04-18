@@ -7,6 +7,8 @@ let randomIntFromInterval = (min, max) => {
 export let addExponentialBackOff = (message :DequeuedMessage): DequeuedMessage => {
     // calculate backoff time
     let base_backoff = 60;
+
+    // visibility_timeout = interval * exponentialRate^retryNumber
     let visibility_timeout =
       base_backoff * 1.5 ** (parseInt(message.attributes.ApproximateReceiveCount) - 1);
     // add jitter
