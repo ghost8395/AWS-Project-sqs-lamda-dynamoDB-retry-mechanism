@@ -22,7 +22,7 @@ const receiver = async (sqsEvent: SQSEvent, context:Context) => {
       successfullyProcessedMessages.push(message);
     } catch (error) {
       if (message.nonRetriableMessage) {
-        if (parseInt(message.attributes.ApproximateReceiveCount) >= 3) {
+        if (parseInt(message.attributes.ApproximateReceiveCount) >= 4) {
           nonRetriableMessages.push(message);
         } else {
           retriableMessages.push(addExponentialBackOff(message));
@@ -33,12 +33,16 @@ const receiver = async (sqsEvent: SQSEvent, context:Context) => {
     }
   });
 
-  if (successfullyProcessedMessages.length > 0 || nonRetriableMessages.length > 0) { await deleteMessages([...successfullyProcessedMessages, ...nonRetriableMessages], MESSAGE_QUEUE_URL); }
+  if (successfullyProcessedMessages.length > 0 || nonRetriableMessages.length > 0) {
+    await deleteMessages([...successfullyProcessedMessages, ...nonRetriableMessages], MESSAGE_QUEUE_URL);
+  }
 
   if (nonRetriableMessages.length > 0) { await pushToDynamoDb(nonRetriableMessages); }
 
   if (retriableMessages.length > 0) {
-    await changeVisibilityMessages(retriableMessages, MESSAGE_QUEUE_URL);
+    if (retriableMessages.filter(ele => ele.VisibilityTimeout > 0).length > 0) {
+      await changeVisibilityMessages(retriableMessages.filter(ele => ele.VisibilityTimeout > 0), MESSAGE_QUEUE_URL)
+    };
     const errorMessage = `Failing due to ${retriableMessages} unsuccessful and retriable errors.`;
     console.log(errorMessage);
     throw new PartialFailureError(errorMessage);

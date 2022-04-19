@@ -23,7 +23,7 @@ const serverlessConfiguration: AWS = {
     iamRoleStatements: [
       {
         Effect: "Allow",
-        Action: ["sqs:SendMessage", "sqs:GetQueueUrl", "sqs:ChangeMessageVisibility", "sqs:ChangeMessageVisibility", "sqs:ChangeMessageVisibilityBatch", "sqs:DeleteMessage", "sqs:DeleteMessageBatch"],
+        Action: ["sqs:SendMessage", "sqs:GetQueueUrl", "sqs:ChangeMessageVisibility", "sqs:ChangeMessageVisibilityBatch", "sqs:DeleteMessageBatch"],
         Resource: "arn:aws:sqs:${self:provider.region}:*:MyQueue",
       },
       {
@@ -34,15 +34,9 @@ const serverlessConfiguration: AWS = {
       {
         Effect: "Allow",
         Action: [
-          "dynamodb:DescribeTable",
-          "dynamodb:Query",
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:UpdateItem",
-          "dynamodb:BatchWriteItem",
-          "dynamodb:DeleteItem",
+          "dynamodb:BatchWriteItem"
         ],
-        Resource: "arn:aws:dynamodb:${self:provider.region}:*:*",
+        Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/NonRetriableRecords",
       },
     ],
   },

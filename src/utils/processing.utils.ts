@@ -4,22 +4,26 @@ let randomIntFromInterval = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1) + min);
 };
   
-export let addExponentialBackOff = (message :DequeuedMessage): DequeuedMessage => {
-    // calculate backoff time
-    let base_backoff = 60;
+export let addExponentialBackOff = (message: DequeuedMessage): DequeuedMessage => {
+  // calculate backoff time
+  let base_backoff = 60, visibility_timeout, timeoutWithJitter;
 
+  if (parseInt(message.attributes.ApproximateReceiveCount) === 1) {
+    timeoutWithJitter = 0;
+  } else {
     // visibility_timeout = interval * exponentialRate^retryNumber
-    let visibility_timeout =
-      base_backoff * 1.5 ** (parseInt(message.attributes.ApproximateReceiveCount) - 1);
+    visibility_timeout =
+      base_backoff * 1.5 ** (parseInt(message.attributes.ApproximateReceiveCount) - 2);
     // add jitter
-    let timeoutWithJitter = randomIntFromInterval(
+    timeoutWithJitter = randomIntFromInterval(
       base_backoff,
       visibility_timeout
     );
-    // addVisibilityToMessage
-    message.VisibilityTimeout = timeoutWithJitter;
-    return message;
-  };
+  }
+  // addVisibilityToMessage
+  message.VisibilityTimeout = timeoutWithJitter;
+  return message;
+};
   
 export let processMessage = (message: DequeuedMessage) => {
     if (message.nonRetriableMessage) {

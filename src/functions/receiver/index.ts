@@ -5,7 +5,7 @@ export default {
   events: [
     {
       sqs: {
-        batchSize: 2,
+        batchSize: 10,
         arn: { "Fn::GetAtt": ['MyQueue', 'Arn'] },
         enabled: true
       }
